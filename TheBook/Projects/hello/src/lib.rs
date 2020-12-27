@@ -17,7 +17,7 @@ impl ThreadPool {
     let mut workers = Vec::with_capacity(size);
 
     for id in 0..size {
-      workers.push(Worker::new(id));
+      workers.push(Worker::new(id, receiver));
     }
 
     ThreadPool { workers, sender }
@@ -32,12 +32,13 @@ impl ThreadPool {
 
 struct Worker {
   id: usize,
-  thread: thread::JoinHandle<()>,
+  //thread: thread::JoinHandle<()>,
+  thread: thread::JoinHandle<std::sync::mpsc::Receiver<Job>>,
 }
 
 impl Worker {
-  fn new(id: usize) -> Worker {
-    let thread = thread::spawn(|| {});
+  fn new(id: usize, receiver: mpsc::Receiver<Job>) -> Worker {
+    let thread = thread::spawn(|| receiver);
     Worker { id, thread }
   }
 }
